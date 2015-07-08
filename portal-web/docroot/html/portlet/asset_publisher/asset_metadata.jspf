@@ -94,6 +94,11 @@ for (int j = 0; j < metadataFields.length; j++) {
 						portletURL="<%= renderResponse.createRenderURL() %>"
 					/>
 				</c:when>
+				
+				<%-- PolitAktiv: Icon for view count: use bootstrap icon from glyphicons: http://glyphicons.com/license/ --%>
+				<c:when test='<%= metadataFields[j].equals("view-count") %>' >
+					<i class="icon-eye-open" icon-white> </i> <%= value %> 
+				</c:when>
 				<c:otherwise>
 					<%= value %>
 				</c:otherwise>

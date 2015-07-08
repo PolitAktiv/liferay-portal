@@ -122,15 +122,12 @@ request.setAttribute("view_entry_content.jsp-assetEntry", assetEntry);
 <c:if test="<%= enableComments %>">
 	<liferay-ui:panel-container extended="<%= false %>" id="blogsCommentsPanelContainer" persistState="<%= true %>">
 		<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="blogsCommentsPanel" persistState="<%= true %>" title="comments">
-			<c:if test="<%= PropsValues.BLOGS_TRACKBACK_ENABLED && entry.isAllowTrackbacks() %>">
-				<liferay-ui:message key="trackback-url" />:
-
-				<liferay-ui:input-resource
-					url='<%= PortalUtil.getLayoutFullURL(themeDisplay) + Portal.FRIENDLY_URL_SEPARATOR + "blogs/trackback/" + entry.getUrlTitle() %>'
-				/>
-
-				<br /><br />
-			</c:if>
+			<%-- PolitAktiv --%>
+			<liferay-ui:message key="current-friendly-url" />: <%// translation of key="friendly-url" in Language_de.properties is bad, see portal-trunk/portal-impl/src/content/Language_de.properties %>
+			<liferay-ui:input-resource
+					url='<%= PortalUtil.getLayoutFullURL(themeDisplay) + Portal.FRIENDLY_URL_SEPARATOR + "blogs/" + entry.getUrlTitle() %>'
+			/>
+			<br /><br />
 
 			<portlet:actionURL var="discussionURL">
 				<portlet:param name="struts_action" value="/blogs/edit_entry_discussion" />

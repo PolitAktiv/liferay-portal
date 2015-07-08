@@ -12,7 +12,10 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+ 
+ Bugfix for https://jira.intra.politaktiv.org/browse/PA-775
 --%>
+
 
 <%@ include file="/html/portlet/layouts_admin/init.jsp" %>
 
@@ -37,7 +40,8 @@ if (selLayout != null) {
 <h4><liferay-ui:message key="meta-tags" /></h4>
 
 <aui:fieldset>
-	<aui:input name="description" />
+	<%-- PolitAktiv --%>
+	<aui:input id="descriptionSEO" name="description" />
 
 	<aui:input name="keywords" />
 
