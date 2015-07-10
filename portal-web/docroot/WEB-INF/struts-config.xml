@@ -45,7 +45,7 @@
 
 		<action path="/portal/json_service" type="com.liferay.portal.action.JSONServiceAction" />
 
-		<action path="/portal/layout" type="com.liferay.portal.action.LayoutAction">
+		<action path="/portal/layout" type="com.fb.action.OpenGraphLayoutAction">
 			<forward name="portal.layout" path="portal.layout" />
 		</action>
 
@@ -328,7 +328,7 @@
 
 		<action path="/blogs/view" forward="portlet.blogs.view" />
 
-		<action path="/blogs/view_entry" type="com.liferay.portlet.blogs.action.EditEntryAction">
+		<action path="/blogs/view_entry" type="com.fb.action.EditEntryAction">
 			<forward name="portlet.blogs.edit_entry" path="portlet.blogs.view_entry" />
 			<forward name="portlet.blogs.error" path="portlet.blogs.error" />
 		</action>
