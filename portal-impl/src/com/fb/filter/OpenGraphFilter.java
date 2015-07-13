@@ -13,6 +13,10 @@
  */
 package com.fb.filter;
 
+import javax.servlet.FilterChain;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.BaseFilter;
@@ -28,25 +32,20 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.util.PortalUtil;
 
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * @author Julio Camarero
  */
 public class OpenGraphFilter extends BaseFilter {
-	public static final String SKIP_FILTER =
-		OpenGraphFilter.class.getName() + "SKIP_FILTER";
+	public static final String SKIP_FILTER = OpenGraphFilter.class.getName()
+			+ "SKIP_FILTER";
 
 	@Override
-	public boolean isFilterEnabled(
-		HttpServletRequest request, HttpServletResponse response) {
+	public boolean isFilterEnabled(HttpServletRequest request,
+			HttpServletResponse response) {
 
 		if (isAlreadyFiltered(request)) {
 			return false;
-		}
-		else {
+		} else {
 			return true;
 		}
 	}
@@ -58,10 +57,9 @@ public class OpenGraphFilter extends BaseFilter {
 			}
 
 			try {
-				_appNamespaces = PrefsPropsUtil.getStringArray(
-					_companyId, "APP_NAMESPACES", StringPool.NEW_LINE);
-			}
-			catch (Exception e) {
+				_appNamespaces = PrefsPropsUtil.getStringArray(_companyId,
+						"APP_NAMESPACES", StringPool.NEW_LINE);
+			} catch (Exception e) {
 				_log.error(e);
 			}
 		}
@@ -79,8 +77,7 @@ public class OpenGraphFilter extends BaseFilter {
 			sb.append("\" ");
 		}
 
-		return StringUtil.replaceFirst(
-			content, _START_HTML, sb.toString());
+		return StringUtil.replaceFirst(content, _START_HTML, sb.toString());
 	}
 
 	protected Log getLog() {
@@ -90,17 +87,15 @@ public class OpenGraphFilter extends BaseFilter {
 	protected boolean isAlreadyFiltered(HttpServletRequest request) {
 		if (request.getAttribute(SKIP_FILTER) != null) {
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
 
 	@Override
-	protected void processFilter(
-			HttpServletRequest request, HttpServletResponse response,
-			FilterChain filterChain)
-		throws Exception {
+	protected void processFilter(HttpServletRequest request,
+			HttpServletResponse response, FilterChain filterChain)
+			throws Exception {
 
 		request.setAttribute(SKIP_FILTER, Boolean.TRUE);
 
@@ -110,21 +105,19 @@ public class OpenGraphFilter extends BaseFilter {
 			_log.debug("Adding Open Graph Attributes " + completeURL);
 		}
 
-		BufferCacheServletResponse bufferCacheServletResponse =
-			new BufferCacheServletResponse(response);
+		BufferCacheServletResponse bufferCacheServletResponse = new BufferCacheServletResponse(
+				response);
 
 		Thread currentThread = Thread.currentThread();
 
 		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
-		currentThread.setContextClassLoader(
-			PortalClassLoaderUtil.getClassLoader());
+		currentThread.setContextClassLoader(PortalClassLoaderUtil
+				.getClassLoader());
 
 		try {
-			processFilter(
-				OpenGraphFilter.class, request, bufferCacheServletResponse,
-				filterChain);
-		}
-		finally {
+			processFilter(OpenGraphFilter.class, request,
+					bufferCacheServletResponse, filterChain);
+		} finally {
 			currentThread.setContextClassLoader(contextClassLoader);
 		}
 
@@ -132,14 +125,13 @@ public class OpenGraphFilter extends BaseFilter {
 
 		String contentType = response.getContentType();
 
-		if ((contentType != null) &&
-			contentType.startsWith(ContentTypes.TEXT_HTML)) {
+		if ((contentType != null)
+				&& contentType.startsWith(ContentTypes.TEXT_HTML)) {
 
 			content = getContent(request, content);
 
 			ServletResponseUtil.write(response, content);
-		}
-		else {
+		} else {
 			ServletResponseUtil.write(response, bufferCacheServletResponse);
 		}
 	}

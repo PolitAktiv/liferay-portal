@@ -67,6 +67,7 @@ public class EditEntryAction extends
 		return forward;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void addOpenGraphProperties(PortletRequest request,
 			PortletResponse response, BlogsEntry entry) throws PortalException,
 			SystemException {
