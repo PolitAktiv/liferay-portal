@@ -52,6 +52,7 @@ public class OpenGraphLayoutAction extends
 		return super.execute(actionMapping, actionForm, request, response);
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void addOpenGraphProperties(HttpServletRequest request)
 			throws PortalException, SystemException {
 
