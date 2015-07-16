@@ -22,3 +22,6 @@
 |git add /portal-impl/src/content/Language_de.properties|Fügt die manuelle Änderung der Language_de.properties dem Index hinzu|
 |git rebase --continue|Beendet das Rebasing, jetzt enthält der Release-Branch die Hooks von beiden Hook-Branches|
 |git push origin pa-release-6.2.1-ga2|Füge den bisher lokalen Release-Branch dem Remote-Repository hinzu|
+
+
+Eventuell macht es Sinn, vor einem weiteren Release mit Release-Branch auf Anfang zurückzugehen und von Vorn zu Mergen, damit sich keine seltsame Commit-Kette aufbaut. Man lese sich ein in https://git-scm.com/book/en/v2/Git-Branching-Rebasing ... 
