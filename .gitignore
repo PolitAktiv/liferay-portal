@@ -88,7 +88,7 @@ cobertura.ser
 /portal-impl/test-results
 /portal-impl/woven-classes
 
-/portal-impl/src/portal-ext.properties
+#/portal-impl/src/portal-ext.properties
 /portal-impl/src/system-ext.properties
 
 /portal-impl/src/META-INF/MANIFEST.MF.JOnAS
