@@ -16,4 +16,13 @@
 
 <%@ include file="/html/taglib/init.jsp" %>
 
+<%
+// Fix: Mathchapta won't be used because mathchapta is defined in properties but preferences have priority over properties.
+// Thus: set the preferences-value to be equal to the properties value
+
+PortletPreferences preferences = com.liferay.portal.util.PrefsPropsUtil.getPreferences();
+preferences.setValue(com.liferay.portal.kernel.util.PropsKeys.CAPTCHA_ENGINE_IMPL, com.liferay.portal.util.PropsValues.CAPTCHA_ENGINE_IMPL);
+preferences.store();
+%>
+
 <%@ page import="com.liferay.portal.kernel.captcha.CaptchaUtil" %>
