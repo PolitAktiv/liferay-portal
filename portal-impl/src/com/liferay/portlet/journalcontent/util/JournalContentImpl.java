@@ -190,6 +190,17 @@ public class JournalContentImpl implements JournalContent {
 				"getDisplay for {" + groupId + ", " + articleId + ", " +
 					ddmTemplateKey + ", " + viewMode + ", " + languageId +
 						", " + page + "} takes " + stopWatch.getTime() + " ms");
+        }
+
+        //!cmChange
+        if (Validator.isNotNull(articleDisplay) && Validator.isNotNull(articleDisplay.getContent())) {
+            String content = articleDisplay.getContent();
+            content = content.replaceAll("&lt;wbr/&gt;", "<wbr/>");
+            content = content.replaceAll("&lt;wbr /&gt;", "<wbr />");
+            content = content.replaceAll("&lt;wbr&gt;", "<wbr>");
+            content = content.replaceAll("&amp;#8203;", "&#8203;");
+            content = content.replaceAll("&amp;shy;", "&shy;");
+            articleDisplay.setContent(content);
 		}
 
 		return articleDisplay;

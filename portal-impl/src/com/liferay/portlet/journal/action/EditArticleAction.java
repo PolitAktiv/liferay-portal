@@ -21,16 +21,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HttpUtil;
-import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.LocalizationUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.*;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.security.auth.PrincipalException;
@@ -51,29 +42,21 @@ import com.liferay.portlet.dynamicdatamapping.NoSuchTemplateException;
 import com.liferay.portlet.dynamicdatamapping.StorageFieldRequiredException;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.service.DDMStructureServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
-import com.liferay.portlet.journal.ArticleContentException;
-import com.liferay.portlet.journal.ArticleContentSizeException;
-import com.liferay.portlet.journal.ArticleDisplayDateException;
-import com.liferay.portlet.journal.ArticleExpirationDateException;
-import com.liferay.portlet.journal.ArticleIdException;
-import com.liferay.portlet.journal.ArticleSmallImageNameException;
-import com.liferay.portlet.journal.ArticleSmallImageSizeException;
-import com.liferay.portlet.journal.ArticleTitleException;
-import com.liferay.portlet.journal.ArticleTypeException;
-import com.liferay.portlet.journal.ArticleVersionException;
-import com.liferay.portlet.journal.DuplicateArticleIdException;
-import com.liferay.portlet.journal.NoSuchArticleException;
+import com.liferay.portlet.journal.*;
 import com.liferay.portlet.journal.asset.JournalArticleAssetRenderer;
 import com.liferay.portlet.journal.model.JournalArticle;
+import com.liferay.portlet.journal.model.JournalArticleConstants;
+import com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portlet.journal.service.JournalArticleServiceUtil;
 import com.liferay.portlet.journal.service.JournalContentSearchLocalServiceUtil;
 import com.liferay.portlet.journal.util.JournalConverterUtil;
 import com.liferay.portlet.journal.util.JournalUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -316,7 +299,9 @@ public class EditArticleAction extends PortletAction {
 		throws Exception {
 
 		try {
-			ActionUtil.getArticle(renderRequest);
+            //!cmChange
+            //ActionUtil.getArticle(renderRequest);
+            getArticle(renderRequest);
 		}
 		catch (NoSuchArticleException nsae) {
 
@@ -624,6 +609,16 @@ public class EditArticleAction extends PortletAction {
 			images = (HashMap<String, byte[]>)contentAndImages[1];
 		}
 
+        //!cmChange
+        //replace &lt;wbr/&gt; with <wbr/>
+        if (Validator.isNotNull(content)) {
+            content = content.replaceAll("&lt;wbr/&gt;", "<wbr/>");
+            content = content.replaceAll("&lt;wbr /&gt;", "<wbr />");
+            content = content.replaceAll("&lt;wbr&gt;", "<wbr>");
+            content = content.replaceAll("&amp;#8203;", "&#8203;");
+            content = content.replaceAll("&amp;shy;", "&shy;");
+        }
+
 		Boolean fileItemThresholdSizeExceeded =
 			(Boolean)uploadPortletRequest.getAttribute(
 				WebKeys.FILE_ITEM_THRESHOLD_SIZE_EXCEEDED);
@@ -878,6 +873,89 @@ public class EditArticleAction extends PortletAction {
 		JournalContentSearchLocalServiceUtil.updateContentSearch(
 			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
 			portletResource, articleId, true);
+    }
+
+    //!cmChange
+    public static void getArticle(PortletRequest portletRequest)
+            throws Exception {
+
+        HttpServletRequest request = PortalUtil.getHttpServletRequest(
+                portletRequest);
+
+        String cmd = ParamUtil.getString(request, Constants.CMD);
+
+        ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
+                WebKeys.THEME_DISPLAY);
+
+        long resourcePrimKey = ParamUtil.getLong(request, "resourcePrimKey");
+        long groupId = ParamUtil.getLong(
+                request, "groupId", themeDisplay.getScopeGroupId());
+        long classNameId = ParamUtil.getLong(request, "classNameId");
+        long classPK = ParamUtil.getLong(request, "classPK");
+        String articleId = ParamUtil.getString(request, "articleId");
+        String structureId = ParamUtil.getString(request, "structureId");
+        int status = ParamUtil.getInteger(
+                request, "status", WorkflowConstants.STATUS_ANY);
+
+        JournalArticle article = null;
+
+        if (cmd.equals(Constants.ADD) && (resourcePrimKey != 0)) {
+            article = JournalArticleLocalServiceUtil.getLatestArticle(
+                    resourcePrimKey, status, false);
+        }
+        else if (!cmd.equals(Constants.ADD) && Validator.isNotNull(articleId)) {
+            article = JournalArticleServiceUtil.getLatestArticle(
+                    groupId, articleId, status);
+        }
+        else if ((classNameId > 0) &&
+                (classPK > JournalArticleConstants.CLASSNAME_ID_DEFAULT)) {
+
+            String className = PortalUtil.getClassName(classNameId);
+
+            article = JournalArticleServiceUtil.getLatestArticle(
+                    groupId, className, classPK);
+        }
+        else if (Validator.isNotNull(structureId)) {
+            DDMStructure ddmStructure = null;
+
+            try {
+                ddmStructure = DDMStructureServiceUtil.getStructure(
+                        groupId, PortalUtil.getClassNameId(JournalArticle.class),
+                        structureId, true);
+            }
+            catch (NoSuchStructureException nsse1) {
+                return;
+            }
+
+            article = JournalArticleServiceUtil.getArticle(
+                    ddmStructure.getGroupId(), DDMStructure.class.getName(),
+                    ddmStructure.getStructureId());
+
+            article.setNew(true);
+
+            article.setId(0);
+            article.setGroupId(groupId);
+            article.setClassNameId(
+                    JournalArticleConstants.CLASSNAME_ID_DEFAULT);
+            article.setClassPK(0);
+            article.setArticleId(null);
+            article.setVersion(0);
+        }
+
+        //replace <wbr/> with &lt;wbr/&gt;
+        if (article != null && Validator.isNotNull(article.getContent())) {
+            String content = article.getContent();
+            content = content.replaceAll("<wbr/>", "&lt;wbr/&gt;");
+            content = content.replaceAll("<wbr />", "&lt;wbr /&gt;");
+            content = content.replaceAll("<wbr>", "&lt;wbr&gt;");
+            content = content.replaceAll("&#8203;", "&amp;#8203;");
+            content = content.replaceAll("&shy;", "&amp;shy;");
+            article.setContent(content);
+        }
+
+        request.setAttribute(WebKeys.JOURNAL_ARTICLE, article);
+
+        JournalUtil.addRecentArticle(portletRequest, article);
 	}
 
 }
