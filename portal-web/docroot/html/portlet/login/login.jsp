@@ -15,7 +15,7 @@
 --%>
 
 <%@ include file="/html/portlet/login/init.jsp" %>
-
+<input style="display:none" tabindex="0"/> <%-- it removes autofocus --%>
 <c:choose>
 	<c:when test="<%= themeDisplay.isSignedIn() %>">
 
