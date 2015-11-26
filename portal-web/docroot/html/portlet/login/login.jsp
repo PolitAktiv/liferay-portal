@@ -130,7 +130,7 @@
 					}
 					%>
 	
-					<aui:input autoFocus="<%= windowState.equals(LiferayWindowState.EXCLUSIVE) || windowState.equals(WindowState.MAXIMIZED) %>" cssClass="clearable" label="<%= loginLabel %>" name="login" showRequiredLabel="<%= false %>" type="text" value="<%= login %>">
+					<aui:input autoFocus="<%= false %>" cssClass="clearable" label="<%= loginLabel %>" name="login" showRequiredLabel="<%= false %>" type="text" value="<%= login %>">
 						<aui:validator name="required" />
 					</aui:input>
 	
@@ -171,6 +171,8 @@
 					}
 				);
 			}
+            var login = A.one('#<portlet:namespace />login');
+            login.blur();
 		</aui:script>
 	</c:otherwise>
 </c:choose>
